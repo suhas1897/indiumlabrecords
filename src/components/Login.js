@@ -11,7 +11,7 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('https://labrecordsbackend.onrender.com', { email, password });
+      const res = await axios.post('https://labrecordsbackend.onrender.com/login', { email, password });
       if (res.data.token) {
         localStorage.setItem('token', res.data.token);
         navigate('/dashboard');
