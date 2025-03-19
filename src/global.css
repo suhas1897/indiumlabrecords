@@ -1,0 +1,292 @@
+/* 🌍 Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #007367;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #f0e0c1;
+}
+
+/* 📦 Dashboard Container */
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    background: #003d36;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    overflow: hidden;
+}
+
+/* 🎯 Dashboard Title */
+h2 {
+    color: #f0e0c1;
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
+/* ✏️ Input Fields */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #f0e0c1;
+    border-radius: 6px;
+    font-size: 16px;
+    background: #005c50;
+    color: #f0e0c1;
+    transition: 0.3s ease;
+}
+
+input::placeholder {
+    color: rgba(240, 224, 193, 0.7);
+}
+
+input:focus, select:focus {
+    border-color: #f0e0c1;
+    box-shadow: 0 0 6px rgba(240, 224, 193, 0.8);
+}
+
+/* 🎨 Buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #009e85, #005c50);
+    border: none;
+    color: #f0e0c1;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #007367, #004c44);
+}
+
+/* 🚀 Next & Prev Buttons */
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.pagination-button {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.pagination-button.prev {
+    background: #004c44;
+    color: #f0e0c1;
+}
+
+.pagination-button.next {
+    background: #007367;
+    color: #f0e0c1;
+}
+
+.pagination-button:hover {
+    opacity: 0.8;
+}
+
+.pagination-button:disabled {
+    background: #555;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* 📊 Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #005c50;
+    color: #f0e0c1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+thead {
+    background: linear-gradient(135deg, #009e85, #005c50);
+    color: white;
+}
+
+th, td {
+    padding: 14px;
+    text-align: center;
+}
+
+th {
+    font-size: 18px;
+}
+
+tbody tr {
+    transition: 0.3s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #007367;
+}
+
+tbody tr:hover {
+    background-color: rgba(240, 224, 193, 0.2);
+    transform: scale(1.02);
+}
+
+/* 📱 Fully Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    input, button, select {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* 📱 Responsive Table */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-radius: 0;
+    }
+
+    th, td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* 🏷️ Button Enhancements */
+    button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* 📱 Pagination Adjustments */
+    .pagination-container {
+        justify-content: center;
+    }
+}
+
+li{
+    list-style: square;
+    font-size: medium;
+    line-height: 2.0;
+}
+
+td{
+    text-transform: capitalize;
+}
+/* 📱 Extra Small Screens (Phones below 480px) */
+@media (max-width: 480px) {
+    .dashboard-container {
+        width: 100%;
+        padding: 10px;
+        border-radius: 0;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    input, button, select {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    /* 📋 Stacked Table */
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    /* 📲 Buttons */
+    button {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    /* 🏷️ Pagination Buttons */
+    .pagination-button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    @media (max-width: 480px) {
+        table {
+            display: table; /* Reverts to standard table behavior */
+            overflow-x: auto; /* Allows horizontal scroll if needed */
+            white-space: normal; /* Prevents text wrapping issues */
+        }
+    
+        th, td {
+            padding: 6px; /* Slightly smaller padding */
+            font-size: 12px; /* Slightly smaller text */
+            min-width: 60px; /* Adjusted for smaller screens */
+        }
+    
+        /* Optional: Stack table for very small screens */
+        thead {
+            display: none; /* Hide header for stacked view */
+        }
+    
+        tbody tr {
+            display: block;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f0e0c1;
+        }
+    
+        tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            padding: 8px;
+            border: none;
+            border-bottom: 1px solid rgba(240, 224, 193, 0.3);
+        }
+    
+        tbody td:before {
+            content: attr(data-label); /* Requires data-label attribute in HTML */
+            font-weight: bold;
+            margin-right: 10px;
+            color: #f0e0c1;
+        }
+    }
+    
+    /* 📋 List Styles */
+    li {
+        list-style: square;
+        font-size: medium;
+        line-height: 2.0;
+    }
+}
+
+
