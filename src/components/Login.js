@@ -1,27 +1,56 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-// https://labrecords.onrender.com
+
 
 function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const API_URL = 'https://labrecordsbackend.onrender.com'
+  // const handleLogin = async () => {
+  //   try {
+  //     const res = await axios.post('https://labrecordsbackend.onrender.com', { email, password });
+  //     if (res.data.token) {
+  //       localStorage.setItem('token', res.data.token);
+  //       navigate('/dashboard');
+  //     } else {
+  //       alert('Login failed. Please check your credentials.');
+  //     }
+  //   } catch (err) {
+  //     alert(err.response?.data?.error || 'Invalid credentials');
+  //   }
+  // };
 
-  const handleLogin = async () => {
-    try {
-      const res = await axios.post('https://labrecordsbackend.onrender.com/login', { email, password });
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        navigate('/dashboard');
-      } else {
-        alert('Login failed. Please check your credentials.');
-      }
-    } catch (err) {
-      alert(err.response?.data?.error || 'Invalid credentials');
-    }
-  };
+
+
+  // const handleLogin = async () => {
+  //   try {
+  //     const res = await axios.post('http://localhost:5000/login', { email, password });
+  //     if (res.data.token) {
+  //       localStorage.setItem('token', res.data.token);
+  //       navigate('/dashboard');
+  //     } else {
+  //       alert('Login failed. Please check your credentials.');
+  //     }
+  //   } catch (err) {
+  //     alert(err.response?.data?.error || 'Invalid credentials');
+  //   }
+  // };
+
+
+  // In your login component
+const handleLogin = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post(`${API_URL}/login`, { email, password });
+    localStorage.setItem("token", response.data.token);
+    navigate("/dashboard"); // Redirect to ChemicalPage
+  } catch (error) {
+    console.error(error);
+  }
+};
   
 
   return (
