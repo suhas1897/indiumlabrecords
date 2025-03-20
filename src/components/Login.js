@@ -57,7 +57,11 @@ const handleLogin = async (e) => {
 
   return (
     <div className="login-container">
-      <img src='https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png'/>
+      <img 
+    src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742466457/Alchemira/efpj7hd9qeczldekojn1.png" 
+    alt="CIMS Logo" 
+    style={{ display: 'block', margin: '0 auto' }} 
+  />
       <h2>Login</h2>
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
