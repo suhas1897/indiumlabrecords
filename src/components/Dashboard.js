@@ -1010,11 +1010,12 @@ const handleDelete = async (chemicalId) => {
   console.log('chemicalData:', chemicalData); // Debug log
   return (
     <div className="form-container">
+      <h1 style={{fontFamily: 'Aptos'}}>CIMS - Chemical inventory Management System</h1>
       <h2>Welcome, {userName}!</h2>
 
       {role === "admin" && (
         <>
-        <img src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742386187/xqvlntnphywafdza7foi.png" />
+        <img src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png" />
           <h2>Admin Dashboard</h2>
           {/* <button onClick={downloadExcel}>Download Excel</button> */}
           <div style={{ marginBottom: "20px" }}>
@@ -1045,14 +1046,14 @@ const handleDelete = async (chemicalId) => {
                 type={
                   key.includes("date") || key === "purchaseDate"
                     ? "date"
-                    : key === "gramsAvailable" || key === "purchase"
+                    : key === "GramsAvailable" || key === "Purchase"
                     ? "number"
                     : "text"
                 }
                 name={key}
                 value={newChemical[key]}
                 onChange={handleChange}
-                required={key !== "purchase" && key !== "purchaseDate"}
+                required={key !== "Purchase" && key !== "PurchaseDate"}
                
               />
             </div>
