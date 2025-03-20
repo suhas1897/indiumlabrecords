@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import Select from "react-select";
 import "./ChemicalPage.css";
 
- function ChemicalPage() {
+function ChemicalPage() {
   const [role, setRole] = useState(null);
   const [chemicalData, setChemicalData] = useState([]);
   const [userUsageData, setUserUsageData] = useState([]);
@@ -41,6 +41,286 @@ const [repeatChemicalId, setRepeatChemicalId] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
 
+//   useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//       Swal.fire({
+//         icon: "error",
+//         title: "Unauthorized",
+//         text: "Please log in to continue.",
+//       }).then(() => navigate("/login"));
+//       return;
+//     }
+  
+//     const fetchData = async () => {
+//       try {
+//         const roleRes = await axios.get(`${API_URL}/userRole`, {
+//           headers: { Authorization: `Bearer ${token}` },
+//         });
+//         const userRole = roleRes.data.role || "user";
+//         setRole(userRole);
+  
+//         const promises = [
+//           axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } }),
+//           axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } }),
+//           axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
+//         ];
+  
+//         if (userRole === "admin") {
+//           promises.push(
+//             axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } }),
+//           axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } }),
+//           axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
+//             axios.get(`${API_URL}/getScrapChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
+//             axios.get(`${API_URL}/getNewChemicalRequests`, { headers: { Authorization: `Bearer ${token}` } })
+//           );
+//         }
+  
+//         const [chemicalsRes, userDetailsRes, userChemicalsRes, ...adminResponses] = await Promise.all(promises);
+  
+//         setChemicalData(chemicalsRes.data || []);
+//         setUserName(userDetailsRes.data.userName || "Unknown User");
+//         setUserUsageData(userChemicalsRes.data || []);
+  
+//         if (userRole === "admin") {
+//           setScrapChemicals(adminResponses[0]?.data || []);
+//           setNewChemicalRequests(adminResponses[1]?.data || []);
+//         }
+//       } catch (error) {
+//         Swal.fire({
+//           icon: "error",
+//           title: "Oops...",
+//           text: error.response?.data?.error || "Error fetching data!",
+//         });
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+  
+//     fetchData();
+//   }, [navigate]);
+
+// user login 
+  // const [role, setRole] = useState(null);
+  // const [chemicalData, setChemicalData] = useState([]);
+  // const [userUsageData, setUserUsageData] = useState([]);
+  // const [userName, setUserName] = useState("");
+  // const [selectedChemical, setSelectedChemical] = useState("");
+  // const [selectedChemicalDetails, setSelectedChemicalDetails] = useState(null);
+  // const [requestedGrams, setRequestedGrams] = useState("");
+  // const [scrapRequestChemicalId, setScrapRequestChemicalId] = useState("");
+  // const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
+  // const [editable, setEditable] = useState(false);
+  // const [newChemical, setNewChemical] = useState({
+  //   chemicalName: "",
+  //   chemicalType: "",
+  //   type: "",
+  //   gramsAvailable: "",
+  //   make: "",
+  //   dateOfMFG: "",
+  //   dateOfExp: "",
+  //   purchase: "",
+  //   purchaseDate: "",
+  // });
+  // const [editChemical, setEditChemical] = useState(null);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const itemsPerPage = 5;
+  // const navigate = useNavigate();
+  // const API_URL = "http://localhost:5000";
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [repeatChemicalId, setRepeatChemicalId] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
+  
+  // // Add missing state declarations for scrapChemicals and newChemicalRequests
+  const [scrapChemicals, setScrapChemicals] = useState([]);
+  const [newChemicalRequests, setNewChemicalRequests] = useState([]);
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Unauthorized",
+  //       text: "Please log in to continue.",
+  //     }).then(() => navigate("/login"));
+  //     return;
+  //   }
+
+  //   const fetchData = async () => {
+  //     try {
+  //       const roleRes = await axios.get(`${API_URL}/userRole`, {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+  //       const userRole = roleRes.data.role || "user";
+  //       setRole(userRole);
+
+  //       const promises = [
+  //         axios.get(`${API_URL}/getchemicals`, {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }),
+  //         axios.get(`${API_URL}/getUserDetails`, {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }),
+  //         axios.get(`${API_URL}/getUserChemicals`, {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }),
+  //       ];
+
+  //       if (userRole === "admin") {
+  //         promises.push(
+  //           axios.get(`${API_URL}/getScrapChemicals`, {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //           }),
+  //           axios.get(`${API_URL}/getNewChemicalRequests`, {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //           })
+  //         );
+  //       }
+
+  //       const [
+  //         chemicalsRes,
+  //         userDetailsRes,
+  //         userChemicalsRes,
+  //         ...adminResponses
+  //       ] = await Promise.all(promises);
+
+  //       setChemicalData(chemicalsRes.data || []);
+  //       setUserName(userDetailsRes.data.userName || "Unknown User");
+  //       setUserUsageData(userChemicalsRes.data || []);
+
+  //       if (userRole === "admin") {
+  //         setScrapChemicals(adminResponses[0]?.data || []);
+  //         setNewChemicalRequests(adminResponses[1]?.data || []);
+  //       }
+  //     } catch (error) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Oops...",
+  //         text: error.response?.data?.error || "Error fetching data!",
+  //       });
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [navigate]);
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Unauthorized",
+  //       text: "Please log in to continue.",
+  //     }).then(() => navigate("/login"));
+  //     return;
+  //   }
+  
+  //   const fetchData = async () => {
+  //     try {
+  //       console.log("Starting fetchData...");
+  //       const roleRes = await axios.get(`${API_URL}/userRole`, {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+  //       const userRole = roleRes.data.role || "user";
+  //       setRole(userRole);
+  //       console.log("Role fetched:", userRole);
+  
+  //       const promises = [
+  //         axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } })
+  //           .then(res => {
+  //             console.log("getchemicals success:", res.data);
+  //             return res;
+  //           })
+  //           .catch(err => {
+  //             console.error("getchemicals error:", err.response?.data || err.message);
+  //             throw new Error(`getchemicals failed: ${err.message}`);
+  //           }),
+  //         axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } })
+  //           .then(res => {
+  //             console.log("getUserDetails success:", res.data);
+  //             return res;
+  //           })
+  //           .catch(err => {
+  //             console.error("getUserDetails error:", err.response?.data || err.message);
+  //             throw new Error(`getUserDetails failed: ${err.message}`);
+  //           }),
+  //         axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } })
+  //           .then(res => {
+  //             console.log("getUserChemicals success:", res.data);
+  //             return res;
+  //           })
+  //           .catch(err => {
+  //             console.error("getUserChemicals error:", err.response?.data || err.message);
+  //             throw new Error(`getUserChemicals failed: ${err.message}`);
+  //           }),
+  //       ];
+  
+  //       if (userRole === "admin") {
+  //         promises.push(
+  //           axios.get(`${API_URL}/getScrapChemicals`, { headers: { Authorization: `Bearer ${token}` } })
+  //             .then(res => {
+  //               console.log("getScrapChemicals success:", res.data);
+  //               return res;
+  //             })
+  //             .catch(err => {
+  //               console.error("getScrapChemicals error:", err.response?.data || err.message);
+  //               throw new Error(`getScrapChemicals failed: ${err.message}`);
+  //             }),
+  //           axios.get(`${API_URL}/getNewChemicalRequests`, { headers: { Authorization: `Bearer ${token}` } })
+  //             .then(res => {
+  //               console.log("getNewChemicalRequests success:", res.data);
+  //               return res;
+  //             })
+  //             .catch(err => {
+  //               console.error("getNewChemicalRequests error:", err.response?.data || err.message);
+  //               throw new Error(`getNewChemicalRequests failed: ${err.message}`);
+  //             })
+  //         );
+  //       }
+  
+  //       console.log("Awaiting Promise.all with", promises.length, "promises...");
+  //       const [chemicalsRes, userDetailsRes, userChemicalsRes, ...adminResponses] = await Promise.all(promises);
+  //       console.log("Promise.all resolved:", { chemicalsRes, userDetailsRes, userChemicalsRes, adminResponses });
+  
+  //       // Set state with fetched data
+  //       console.log("Setting chemicalData...");
+  //       setChemicalData(chemicalsRes.data || []);
+  //       console.log("Setting userName...");
+  //       setUserName(userDetailsRes.data.userName || "Unknown User");
+  //       console.log("Setting userUsageData...");
+  //       setUserUsageData(userChemicalsRes.data || []);
+  
+  //       if (userRole === "admin") {
+  //         console.log("Setting scrapChemicals...");
+  //         setScrapChemicals(adminResponses[0]?.data || []);
+  //         console.log("Setting newChemicalRequests...");
+  //         setNewChemicalRequests(adminResponses[1]?.data || []);
+  //       }
+  
+  //       console.log("FetchData completed successfully!");
+  //     } catch (error) {
+  //       console.error("Fetch error details:", {
+  //         message: error.message,
+  //         response: error.response?.data,
+  //         status: error.response?.status,
+  //         stack: error.stack,
+  //       });
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Oops...",
+  //         text: error.message || "Error fetching data!",
+  //       });
+  //     } finally {
+  //       console.log("Setting isLoading to false...");
+  //       setIsLoading(false);
+  //     }
+  //   };
+  
+  //   fetchData();
+  // }, [navigate]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -51,33 +331,118 @@ const [repeatChemicalId, setRepeatChemicalId] = useState("");
       }).then(() => navigate("/login"));
       return;
     }
-
+  
     const fetchData = async () => {
       try {
-        const [roleRes, chemicalsRes, userDetailsRes, userChemicalsRes] = await Promise.all([
-          axios.get(`${API_URL}/userRole`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
+        console.log("Starting fetchData...");
+        const roleRes = await axios.get(`${API_URL}/userRole`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userRole = roleRes.data.role || "user";
+        setRole(userRole);
+        console.log("Role fetched:", userRole);
+  
+        const promises = [
+          axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(res => {
+              console.log("getchemicals success:", res.data);
+              return res;
+            })
+            .catch(err => {
+              console.error("getchemicals error:", err.response?.data || err.message);
+              throw new Error(`getchemicals failed: ${err.message}`);
+            }),
+          axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(res => {
+              console.log("getUserDetails success:", res.data);
+              return res;
+            })
+            .catch(err => {
+              console.error("getUserDetails error:", err.response?.data || err.message);
+              throw new Error(`getUserDetails failed: ${err.message}`);
+            }),
+          axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(res => {
+              console.log("getUserChemicals success:", res.data);
+              return res;
+            })
+            .catch(err => {
+              console.error("getUserChemicals error:", err.response?.data || err.message);
+              throw new Error(`getUserChemicals failed: ${err.message}`);
+            }),
+        ];
+  
+        if (userRole === "admin") {
+          promises.push(
+            axios.get(`${API_URL}/getScrapChemicals`, { headers: { Authorization: `Bearer ${token}` } })
+              .then(res => {
+                console.log("getScrapChemicals success:", res.data);
+                return res;
+              })
+              .catch(err => {
+                console.error("getScrapChemicals error:", err.response?.data || err.message);
+                throw new Error(`getScrapChemicals failed: ${err.message}`);
+              }),
+            // axios.get(`${API_URL}/getNewChemicalRequests`, { headers: { Authorization: `Bearer ${token}` } })
+            //   .then(res => {
+            //     console.log("getNewChemicalRequests success:", res.data);
+            //     return res;
+            //   })
+            //   .catch(err => {
+            //     console.error("getNewChemicalRequests error:", err.response?.data || err.message);
+            //     throw new Error(`getNewChemicalRequests failed: ${err.message}`);
+            //   })
 
-        setRole(roleRes.data.role || "user");
+          );
+        }
+  
+        console.log("Awaiting Promise.all with", promises.length, "promises...");
+        const [chemicalsRes, userDetailsRes, userChemicalsRes, ...adminResponses] = await Promise.all(promises);
+        console.log("Promise.all resolved:", { chemicalsRes, userDetailsRes, userChemicalsRes, adminResponses });
+  
+        // Set state with fetched data
+        console.log("Setting chemicalData...");
         setChemicalData(chemicalsRes.data || []);
+        console.log("Setting userName...");
         setUserName(userDetailsRes.data.userName || "Unknown User");
+        console.log("Setting userUsageData...");
         setUserUsageData(userChemicalsRes.data || []);
+  
+        // Place the admin-specific logic here
+        if (userRole === "admin") {
+          const scrapData = Array.isArray(adminResponses[0]?.data) ? adminResponses[0].data : [];
+          const newReqData = Array.isArray(adminResponses[1]?.data) ? adminResponses[1].data : [];
+          console.log("Setting scrapChemicals with:", scrapData);
+          setScrapChemicals(scrapData);
+          console.log("Setting newChemicalRequests with:", newReqData);
+          setNewChemicalRequests(newReqData);
+        }
+  
+        console.log("FetchData completed successfully!");
       } catch (error) {
+        console.error("Fetch error details:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+          stack: error.stack,
+        });
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: error.response?.data?.error || "Error fetching data!",
+          text: error.message || "Error fetching data!",
         });
       } finally {
+        console.log("Setting isLoading to false...");
         setIsLoading(false);
       }
     };
-
+  
     fetchData();
   }, [navigate]);
+
+
+
+
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -418,13 +783,71 @@ const handleDelete = async (chemicalId) => {
 
   
   
-  const downloadExcel = () => {
+  // const downloadExcel = () => {
+  //   if (role !== "admin") return;
+  //   const worksheet = XLSX.utils.json_to_sheet(userUsageData);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Chemical Usage");
+  //   XLSX.writeFile(workbook, "chemical_usage.xlsx");
+  // };
+
+
+  const downloadExcel = (type) => {
     if (role !== "admin") return;
-    const worksheet = XLSX.utils.json_to_sheet(userUsageData);
+  
+    let data, filename;
+    switch (type) {
+      case "usage":
+        data = userUsageData;
+        filename = "chemical_usage.xlsx";
+        break;
+      case "scrap":
+        data = scrapChemicals;
+        filename = "scrap_chemicals.xlsx";
+        break;
+      case "new":
+        data = newChemicalRequests;
+        filename = "new_chemical_requests.xlsx";
+        break;
+      default:
+        data = chemicalData;
+        filename = "all_chemicals.xlsx";
+    }
+  
+    const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Chemical Usage");
-    XLSX.writeFile(workbook, "chemical_usage.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, filename);
   };
+
+
+  // const downloadExcel = (type) => {
+  //   if (role !== "admin") return;
+
+  //   let data, filename;
+  //   switch (type) {
+  //     case "usage":
+  //       data = userUsageData;
+  //       filename = "chemical_usage.xlsx";
+  //       break;
+  //     case "scrap":
+  //       data = scrapChemicals;
+  //       filename = "scrap_chemicals.xlsx";
+  //       break;
+  //     case "new":
+  //       data = newChemicalRequests;
+  //       filename = "new_chemical_requests.xlsx";
+  //       break;
+  //     default:
+  //       data = chemicalData;
+  //       filename = "all_chemicals.xlsx";
+  //   }
+
+  //   const worksheet = XLSX.utils.json_to_sheet(data);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  //   XLSX.writeFile(workbook, filename);
+  // };
 
   const capitalizeText = (text) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -593,7 +1016,13 @@ const handleDelete = async (chemicalId) => {
         <>
         <img src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742386187/xqvlntnphywafdza7foi.png" />
           <h2>Admin Dashboard</h2>
-          <button onClick={downloadExcel}>Download Excel</button>
+          {/* <button onClick={downloadExcel}>Download Excel</button> */}
+          <div style={{ marginBottom: "20px" }}>
+      <button onClick={() => downloadExcel("usage")}>Download Usage Excel</button>
+      <button onClick={() => downloadExcel("scrap")}>Download Scrap Excel</button>
+      {/* <button onClick={() => downloadExcel("new")}>Download New Chemical Requests Excel</button> */}
+      <button onClick={() => downloadExcel("all")}>Download All Chemicals Excel</button>
+    </div>
 
           <h2>Add New Chemical</h2>
           <form onSubmit={handleSubmit}>
