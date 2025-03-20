@@ -23,6 +23,7 @@ function ResetPassword() {
 
   return (
     <div className="reset-password-container">
+    <img src='https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png'/>
       <h2>Reset Password</h2>
       <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <input type="text" placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} />
