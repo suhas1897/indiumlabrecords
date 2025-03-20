@@ -38,8 +38,8 @@ const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const navigate = useNavigate();
-  // const API_URL = "https://labrecordsbackend.onrender.com";
-  const API_URL = 'http://localhost:5000';
+  const API_URL = "https://labrecordsbackend.onrender.com";
+  // const API_URL = 'http://localhost:5000';
   const [isLoading, setIsLoading] = useState(true);
   const rackOptions = [
     "ALKALI METALS",
