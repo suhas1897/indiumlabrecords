@@ -27,13 +27,30 @@ const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
     dateOfExp: "",
     purchase: "",
     purchaseDate: "",
+    invoiceNumber: "", // New field for invoice number
+  isAbsolute: false, // New field for absolute checkbox
+  isApproximately: false, // New field for approximately checkbox
+  rack:""
   });
+
+
   const [editChemical, setEditChemical] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const navigate = useNavigate();
-  const API_URL = "https://labrecordsbackend.onrender.com";
+  // const API_URL = "https://labrecordsbackend.onrender.com";
+  const API_URL = 'http://localhost:5000';
   const [isLoading, setIsLoading] = useState(true);
+  const rackOptions = [
+    "ALKALI METALS",
+    "ALKALI EARTH METALS",
+    "POST TRANSITION METALS",
+    "TRANSITION METALS",
+    "OTHERS",
+    "ACIDS",
+    "OTHER SOLUTIONS",
+    "REFRIGERATOR"
+  ];
 
   
   // Add to your state declarations at the top
@@ -41,285 +58,8 @@ const [repeatChemicalId, setRepeatChemicalId] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
 
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     if (!token) {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Unauthorized",
-//         text: "Please log in to continue.",
-//       }).then(() => navigate("/login"));
-//       return;
-//     }
-  
-//     const fetchData = async () => {
-//       try {
-//         const roleRes = await axios.get(`${API_URL}/userRole`, {
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-//         const userRole = roleRes.data.role || "user";
-//         setRole(userRole);
-  
-//         const promises = [
-//           axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-//           axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } }),
-//           axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-//         ];
-  
-//         if (userRole === "admin") {
-//           promises.push(
-//             axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-//           axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } }),
-//           axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-//             axios.get(`${API_URL}/getScrapChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
-//             axios.get(`${API_URL}/getNewChemicalRequests`, { headers: { Authorization: `Bearer ${token}` } })
-//           );
-//         }
-  
-//         const [chemicalsRes, userDetailsRes, userChemicalsRes, ...adminResponses] = await Promise.all(promises);
-  
-//         setChemicalData(chemicalsRes.data || []);
-//         setUserName(userDetailsRes.data.userName || "Unknown User");
-//         setUserUsageData(userChemicalsRes.data || []);
-  
-//         if (userRole === "admin") {
-//           setScrapChemicals(adminResponses[0]?.data || []);
-//           setNewChemicalRequests(adminResponses[1]?.data || []);
-//         }
-//       } catch (error) {
-//         Swal.fire({
-//           icon: "error",
-//           title: "Oops...",
-//           text: error.response?.data?.error || "Error fetching data!",
-//         });
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-  
-//     fetchData();
-//   }, [navigate]);
-
-// user login 
-  // const [role, setRole] = useState(null);
-  // const [chemicalData, setChemicalData] = useState([]);
-  // const [userUsageData, setUserUsageData] = useState([]);
-  // const [userName, setUserName] = useState("");
-  // const [selectedChemical, setSelectedChemical] = useState("");
-  // const [selectedChemicalDetails, setSelectedChemicalDetails] = useState(null);
-  // const [requestedGrams, setRequestedGrams] = useState("");
-  // const [scrapRequestChemicalId, setScrapRequestChemicalId] = useState("");
-  // const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
-  // const [editable, setEditable] = useState(false);
-  // const [newChemical, setNewChemical] = useState({
-  //   chemicalName: "",
-  //   chemicalType: "",
-  //   type: "",
-  //   gramsAvailable: "",
-  //   make: "",
-  //   dateOfMFG: "",
-  //   dateOfExp: "",
-  //   purchase: "",
-  //   purchaseDate: "",
-  // });
-  // const [editChemical, setEditChemical] = useState(null);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const itemsPerPage = 5;
-  // const navigate = useNavigate();
-  // const API_URL = "http://localhost:5000";
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [repeatChemicalId, setRepeatChemicalId] = useState("");
-  // const [searchTerm, setSearchTerm] = useState("");
-  
-  // // Add missing state declarations for scrapChemicals and newChemicalRequests
   const [scrapChemicals, setScrapChemicals] = useState([]);
   const [newChemicalRequests, setNewChemicalRequests] = useState([]);
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Unauthorized",
-  //       text: "Please log in to continue.",
-  //     }).then(() => navigate("/login"));
-  //     return;
-  //   }
-
-  //   const fetchData = async () => {
-  //     try {
-  //       const roleRes = await axios.get(`${API_URL}/userRole`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       const userRole = roleRes.data.role || "user";
-  //       setRole(userRole);
-
-  //       const promises = [
-  //         axios.get(`${API_URL}/getchemicals`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }),
-  //         axios.get(`${API_URL}/getUserDetails`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }),
-  //         axios.get(`${API_URL}/getUserChemicals`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }),
-  //       ];
-
-  //       if (userRole === "admin") {
-  //         promises.push(
-  //           axios.get(`${API_URL}/getScrapChemicals`, {
-  //             headers: { Authorization: `Bearer ${token}` },
-  //           }),
-  //           axios.get(`${API_URL}/getNewChemicalRequests`, {
-  //             headers: { Authorization: `Bearer ${token}` },
-  //           })
-  //         );
-  //       }
-
-  //       const [
-  //         chemicalsRes,
-  //         userDetailsRes,
-  //         userChemicalsRes,
-  //         ...adminResponses
-  //       ] = await Promise.all(promises);
-
-  //       setChemicalData(chemicalsRes.data || []);
-  //       setUserName(userDetailsRes.data.userName || "Unknown User");
-  //       setUserUsageData(userChemicalsRes.data || []);
-
-  //       if (userRole === "admin") {
-  //         setScrapChemicals(adminResponses[0]?.data || []);
-  //         setNewChemicalRequests(adminResponses[1]?.data || []);
-  //       }
-  //     } catch (error) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Oops...",
-  //         text: error.response?.data?.error || "Error fetching data!",
-  //       });
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [navigate]);
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Unauthorized",
-  //       text: "Please log in to continue.",
-  //     }).then(() => navigate("/login"));
-  //     return;
-  //   }
-  
-  //   const fetchData = async () => {
-  //     try {
-  //       console.log("Starting fetchData...");
-  //       const roleRes = await axios.get(`${API_URL}/userRole`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       const userRole = roleRes.data.role || "user";
-  //       setRole(userRole);
-  //       console.log("Role fetched:", userRole);
-  
-  //       const promises = [
-  //         axios.get(`${API_URL}/getchemicals`, { headers: { Authorization: `Bearer ${token}` } })
-  //           .then(res => {
-  //             console.log("getchemicals success:", res.data);
-  //             return res;
-  //           })
-  //           .catch(err => {
-  //             console.error("getchemicals error:", err.response?.data || err.message);
-  //             throw new Error(`getchemicals failed: ${err.message}`);
-  //           }),
-  //         axios.get(`${API_URL}/getUserDetails`, { headers: { Authorization: `Bearer ${token}` } })
-  //           .then(res => {
-  //             console.log("getUserDetails success:", res.data);
-  //             return res;
-  //           })
-  //           .catch(err => {
-  //             console.error("getUserDetails error:", err.response?.data || err.message);
-  //             throw new Error(`getUserDetails failed: ${err.message}`);
-  //           }),
-  //         axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } })
-  //           .then(res => {
-  //             console.log("getUserChemicals success:", res.data);
-  //             return res;
-  //           })
-  //           .catch(err => {
-  //             console.error("getUserChemicals error:", err.response?.data || err.message);
-  //             throw new Error(`getUserChemicals failed: ${err.message}`);
-  //           }),
-  //       ];
-  
-  //       if (userRole === "admin") {
-  //         promises.push(
-  //           axios.get(`${API_URL}/getScrapChemicals`, { headers: { Authorization: `Bearer ${token}` } })
-  //             .then(res => {
-  //               console.log("getScrapChemicals success:", res.data);
-  //               return res;
-  //             })
-  //             .catch(err => {
-  //               console.error("getScrapChemicals error:", err.response?.data || err.message);
-  //               throw new Error(`getScrapChemicals failed: ${err.message}`);
-  //             }),
-  //           axios.get(`${API_URL}/getNewChemicalRequests`, { headers: { Authorization: `Bearer ${token}` } })
-  //             .then(res => {
-  //               console.log("getNewChemicalRequests success:", res.data);
-  //               return res;
-  //             })
-  //             .catch(err => {
-  //               console.error("getNewChemicalRequests error:", err.response?.data || err.message);
-  //               throw new Error(`getNewChemicalRequests failed: ${err.message}`);
-  //             })
-  //         );
-  //       }
-  
-  //       console.log("Awaiting Promise.all with", promises.length, "promises...");
-  //       const [chemicalsRes, userDetailsRes, userChemicalsRes, ...adminResponses] = await Promise.all(promises);
-  //       console.log("Promise.all resolved:", { chemicalsRes, userDetailsRes, userChemicalsRes, adminResponses });
-  
-  //       // Set state with fetched data
-  //       console.log("Setting chemicalData...");
-  //       setChemicalData(chemicalsRes.data || []);
-  //       console.log("Setting userName...");
-  //       setUserName(userDetailsRes.data.userName || "Unknown User");
-  //       console.log("Setting userUsageData...");
-  //       setUserUsageData(userChemicalsRes.data || []);
-  
-  //       if (userRole === "admin") {
-  //         console.log("Setting scrapChemicals...");
-  //         setScrapChemicals(adminResponses[0]?.data || []);
-  //         console.log("Setting newChemicalRequests...");
-  //         setNewChemicalRequests(adminResponses[1]?.data || []);
-  //       }
-  
-  //       console.log("FetchData completed successfully!");
-  //     } catch (error) {
-  //       console.error("Fetch error details:", {
-  //         message: error.message,
-  //         response: error.response?.data,
-  //         status: error.response?.status,
-  //         stack: error.stack,
-  //       });
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Oops...",
-  //         text: error.message || "Error fetching data!",
-  //       });
-  //     } finally {
-  //       console.log("Setting isLoading to false...");
-  //       setIsLoading(false);
-  //     }
-  //   };
-  
-  //   fetchData();
-  // }, [navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -446,6 +186,12 @@ const [repeatChemicalId, setRepeatChemicalId] = useState("");
 
   if (isLoading) return <div>Loading...</div>;
 
+
+
+  const filteredChemicalData = chemicalData.filter((chem) =>
+    chem.chemicalName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const handleChemicalChange = (e) => {
     const chemicalId = e.target.value;
     setSelectedChemical(chemicalId);
@@ -458,67 +204,6 @@ const [repeatChemicalId, setRepeatChemicalId] = useState("");
     label: `${chem.chemicalName} (${chem.gramsAvailable}g available)`,
   }));
 
-
-
-
-  
-
-// Add this new function
-// const handleRepeatChemical = async () => {
-//   const { value: chemicalId } = await Swal.fire({
-//     title: 'Enter Chemical ID',
-//     input: 'text',
-//     inputLabel: 'Chemical ID',
-//     inputPlaceholder: 'Enter the Chemical ID',
-//     showCancelButton: true,
-//     inputValidator: (value) => {
-//       if (!value) {
-//         return 'Please enter a Chemical ID!'
-//       }
-//     }
-//   });
-
-//   if (chemicalId) {
-//     const token = localStorage.getItem("token");
-//     try {
-//       const response = await axios.get(`${API_URL}/getchemicals`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-      
-//       const chemical = response.data.find(chem => chem.chemicalId === chemicalId);
-      
-//       if (chemical) {
-//         // Auto-fill the edit form with existing data and increment counter
-//         const updatedChemical = {
-//           ...chemical,
-//           dateOfMFG: new Date(chemical.dateOfMFG).toISOString().split("T")[0],
-//           dateOfExp: new Date(chemical.dateOfExp).toISOString().split("T")[0],
-//           purchase: chemical.purchase ? parseFloat(chemical.purchase) + 1 : 1 // Increment purchase counter
-//         };
-//         setEditChemical(updatedChemical);
-//         setRepeatChemicalId(chemicalId);
-        
-//         Swal.fire({
-//           icon: "success",
-//           title: "Chemical Found!",
-//           text: `Details for ${chemical.chemicalName} loaded for editing.`,
-//         });
-//       } else {
-//         Swal.fire({
-//           icon: "error",
-//           title: "Not Found",
-//           text: "Chemical ID not found!",
-//         });
-//       }
-//     } catch (error) {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Error",
-//         text: error.response?.data?.error || "Server error",
-//       });
-//     }
-//   }
-// };
 
 
 const handleRepeatChemical = async () => {
@@ -580,13 +265,22 @@ const handleRepeatChemical = async () => {
   }
 };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewChemical((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+const handleChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  let finalValue = type === "checkbox" ? checked : name === "chemicalName" ? value.toUpperCase() : value;
+
+  if (type === "checkbox") {
+    if (name === "isAbsolute" && checked) {
+      setNewChemical((prev) => ({ ...prev, isApproximately: false, [name]: finalValue }));
+    } else if (name === "isApproximately" && checked) {
+      setNewChemical((prev) => ({ ...prev, isAbsolute: false, [name]: finalValue }));
+    } else {
+      setNewChemical((prev) => ({ ...prev, [name]: finalValue }));
+    }
+  } else {
+    setNewChemical((prev) => ({ ...prev, [name]: finalValue }));
+  }
+};
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -624,6 +318,9 @@ const handleRepeatChemical = async () => {
         dateOfMFG: "",
         dateOfExp: "",
         purchase: "",
+        purchaseDate:"",
+        invoiceNumber:"",
+        rack:"",
         
       });
     } catch (error) {
@@ -821,34 +518,6 @@ const handleDelete = async (chemicalId) => {
   };
 
 
-  // const downloadExcel = (type) => {
-  //   if (role !== "admin") return;
-
-  //   let data, filename;
-  //   switch (type) {
-  //     case "usage":
-  //       data = userUsageData;
-  //       filename = "chemical_usage.xlsx";
-  //       break;
-  //     case "scrap":
-  //       data = scrapChemicals;
-  //       filename = "scrap_chemicals.xlsx";
-  //       break;
-  //     case "new":
-  //       data = newChemicalRequests;
-  //       filename = "new_chemical_requests.xlsx";
-  //       break;
-  //     default:
-  //       data = chemicalData;
-  //       filename = "all_chemicals.xlsx";
-  //   }
-
-  //   const worksheet = XLSX.utils.json_to_sheet(data);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-  //   XLSX.writeFile(workbook, filename);
-  // };
-
   const capitalizeText = (text) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
   };
@@ -865,48 +534,6 @@ const handleDelete = async (chemicalId) => {
       setCurrentPage(currentPage - 1);
     }
   };
-
-
-
-
-  // const handleScrapRequest = async () => {
-  //   const { value: chemicalId } = await Swal.fire({
-  //     title: "Enter Chemical ID for Scrap Request",
-  //     input: "text",
-  //     inputLabel: "Chemical ID",
-  //     inputPlaceholder: "Enter the Chemical ID",
-  //     showCancelButton: true,
-  //     inputValidator: (value) => {
-  //       if (!value) {
-  //         return "Please enter a Chemical ID!";
-  //       }
-  //     },
-  //   });
-  
-  //   if (chemicalId) {
-  //     const token = localStorage.getItem("token");
-  //     try {
-  //       const response = await axios.post(
-  //         `${API_URL}/scrapRequest`,
-  //         { chemicalId },
-  //         { headers: { Authorization: `Bearer ${token}` } }
-  //       );
-  //       Swal.fire({
-  //         icon: "success",
-  //         title: "Scrap Request Sent!",
-  //         text: response.data.message,
-  //       });
-  //       setScrapRequestChemicalId(chemicalId);
-  //     } catch (error) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Error",
-  //         text: error.response?.data?.error || "Server error",
-  //       });
-  //     }
-  //   }
-  // };
-  
 
 
 
@@ -1008,26 +635,95 @@ const handleDelete = async (chemicalId) => {
   const currentItems = userUsageData.slice(indexOfFirstItem, indexOfLastItem);
 
   console.log('chemicalData:', chemicalData); // Debug log
+
+
+
+  const handleResetCounter = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This will reset the chemical ID counter to 0. New chemical IDs will start from MURTI-BLR/INDIUM/BRL-001.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, reset it!",
+    });
+  
+    if (result.isConfirmed) {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.post(
+          `${API_URL}/resetChemicalCounter`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Counter Reset!",
+          text: response.data.message,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.error || "Server error",
+        });
+      }
+    }
+  };
+
+
   return (
     <div className="form-container">
-      <h1 style={{fontFamily: 'Aptos'}}>CIMS - Chemical inventory Management System</h1>
       <h2>Welcome, {userName}!</h2>
+      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+  <img 
+    src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742466457/Alchemira/efpj7hd9qeczldekojn1.png" 
+    alt="CIMS Logo" 
+    style={{ display: 'block', margin: '0 auto' }} 
+  />
+  <h1 style={{  marginTop: '10px' }}>
+    CIMS - Chemical Inventory Management System
+  </h1>
+</div>
+      
 
       {role === "admin" && (
         <>
-        <img src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png" />
-          <h2>Admin Dashboard</h2>
-          {/* <button onClick={downloadExcel}>Download Excel</button> */}
-          <div style={{ marginBottom: "20px" }}>
-      <button onClick={() => downloadExcel("usage")}>Download Usage Excel</button>
-      <button onClick={() => downloadExcel("scrap")}>Download Scrap Excel</button>
-      {/* <button onClick={() => downloadExcel("new")}>Download New Chemical Requests Excel</button> */}
-      <button onClick={() => downloadExcel("all")}>Download All Chemicals Excel</button>
-    </div>
 
-          <h2>Add New Chemical</h2>
-          <form onSubmit={handleSubmit}>
-          {Object.keys(newChemical).map((key) => (
+
+<div style={{ marginBottom: "20px" }}>
+          <button
+            onClick={() => downloadExcel("all")}
+            style={{ marginRight: "10px", padding: "8px 16px" }}
+          >
+            Download All Chemicals
+          </button>
+          <button
+            onClick={() => downloadExcel("usage")}
+            style={{ marginRight: "10px", padding: "8px 16px" }}
+          >
+            Download Usage Data
+          </button>
+          <button
+            onClick={() => downloadExcel("scrap")}
+            style={{ marginRight: "10px", padding: "8px 16px" }}
+          >
+            Download Scrap Chemicals
+          </button>
+          <button
+            onClick={() => downloadExcel("new")}
+            style={{ padding: "8px 16px" }}
+          >
+            Download New Requests
+          </button>
+        </div>
+        
+        <h2>Add New Chemical</h2>
+      <form onSubmit={handleSubmit}>
+        {Object.keys(newChemical)
+          .filter((key) => key !== "isAbsolute" && key !== "isApproximately" && key !== "rack") // Exclude checkboxes from input mapping
+          .map((key) => (
             <div key={key} style={{ margin: "10px 0" }}>
               <label
                 htmlFor={key}
@@ -1042,38 +738,119 @@ const handleDelete = async (chemicalId) => {
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </label>
               <input
-                id={key}
-                type={
-                  key.includes("date") || key === "purchaseDate"
-                    ? "date"
-                    : key === "GramsAvailable" || key === "Purchase"
-                    ? "number"
-                    : "text"
-                }
-                name={key}
-                value={newChemical[key]}
-                onChange={handleChange}
-                required={key !== "Purchase" && key !== "PurchaseDate"}
-               
-              />
+          id={key}
+          type={
+            key.includes("date") || key === "purchaseDate"
+              ? "date"
+              : key === "gramsAvailable" || key === "purchase"
+              ? "number"
+              : "text"
+          }
+          name={key}
+          value={newChemical[key]}
+          onChange={handleChange}
+          required={key !== "purchase" && key !== "purchaseDate" && key !== "invoiceNumber"} // Adjust required fields
+        />
             </div>
           ))}
-          <button
-            type="submit"
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#2c3e50",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              marginTop: "10px",
-            }}
-          >
-            Add Chemical
-          </button>
-        </form>
 
+<div style={{ margin: "10px 0" }}>
+              <label
+                htmlFor="rack"
+                style={{
+                  display: "block",
+                  marginBottom: "5px",
+                  fontSize: "18px",
+                  color: "#fff",
+                  fontWeight: "700",
+                }}
+              >
+                Rack
+              </label>
+              <select
+                id="rack"
+                name="rack"
+                value={newChemical.rack}
+                onChange={handleChange}
+                required
+                style={{ padding: "5px", width: "100%" }}
+              >
+                <option value="">-- Select Rack --</option>
+                {rackOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+        {/* Add Checkboxes */}
+        <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
+          <label style={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="checkbox"
+              name="isAbsolute"
+              checked={newChemical.isAbsolute}
+              onChange={handleChange}
+              style={{
+                width: "16px",
+                height: "16px",
+                marginRight: "8px",
+                accentColor: "#2c3e50",
+                cursor: "pointer",
+              }}
+            />
+            <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Absolute</span>
+          </label>
+          <label style={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="checkbox"
+              name="isApproximately"
+              checked={newChemical.isApproximately}
+              onChange={handleChange}
+              style={{
+                width: "16px",
+                height: "16px",
+                marginRight: "8px",
+                accentColor: "#2c3e50",
+                cursor: "pointer",
+              }}
+            />
+            <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Approximately</span>
+          </label>
+        </div>  
+
+        <button
+          type="submit"
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#2c3e50",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginTop: "10px",
+          }}
+        >
+          Add Chemical
+        </button>
+
+
+        <button
+      onClick={handleResetCounter}
+      style={{
+        padding: "8px 16px",
+        backgroundColor: "#d33",
+        color: "white",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        marginTop: "20px",
+      }}
+    >
+      Reset Chemical ID Counter
+    </button>
+      </form>
           {/* New Checkboxes Section */}
           <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
       <label style={{ display: "flex", alignItems: "center" }}>
@@ -1093,7 +870,6 @@ const handleDelete = async (chemicalId) => {
         Repeat
       </label>
     </div>
-
           {editChemical && (
             <>
               <h2>Edit Chemical</h2>
@@ -1140,7 +916,7 @@ const handleDelete = async (chemicalId) => {
 
                 <input
                   type="date"
-                  name="purchaseDate"
+                  name="PurchaseDate"
                   placeholder="Purchase Date"
                   value={editChemical.purchaseDate}
                   onChange={handleEditChange}
@@ -1168,18 +944,19 @@ const handleDelete = async (chemicalId) => {
                   <th>Date Of EXP</th>
                   <th>Purchase</th>
                   <th>Purchase Date</th>
+                  <th>Invoice Number</th>
+                  <th>Absolute</th>
+                  <th>Approximately</th>
+                  <th>Rack</th>
                   {role === "admin" && <th>User Usage</th>}
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {chemicalData.map((chem) => (
+              {filteredChemicalData.map((chem) => (
                   <tr key={chem.chemicalId}>
                     <td>{chem.chemicalId}</td>
-                    {/* <td>{chem.chemicalName}</td> */}
-                    {/* <td>{capitalizeText(chem.chemicalName)}</td> */}
                     <td style={{ textTransform: "capitalize" }}>{chem.chemicalName}</td>
-
                     <td>{chem.chemicalType}</td>
                     <td>{chem.type}</td>
                     <td>{chem.gramsAvailable}</td>
@@ -1187,28 +964,29 @@ const handleDelete = async (chemicalId) => {
                     <td>{new Date(chem.dateOfExp).toLocaleDateString()}</td>
                     <td>{chem.purchase}</td>
                     <td>{chem.purchaseDate ? new Date(chem.purchaseDate).toLocaleDateString() : "N/A"}</td>
+                    <td>{chem.invoiceNumber || "N/A"}</td>
+                    <td>{chem.isAbsolute ? "Yes" : "No"}</td>
+                    <td>{chem.isApproximately ? "Yes" : "No"}</td>
+                    <td>{chem.rack}</td>
                     {role === "admin" && (
                       <td>
-                        {chem.userUsage && chem.userUsage.length > 0 ? (
-                          <ul>
-                            {chem.userUsage.map((usage, index) => (
-                              <li key={index}>
-                                {usage.userName} used {usage.gramsUsed}g on{" "}
-                                {new Date(usage.date).toLocaleDateString()}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          "No usage recorded"
-                        )}
-                      </td>
+                      {chem.userUsage && chem.userUsage.length > 0 ? (
+                        <ul>
+                          {chem.userUsage.map((usage, index) => (
+                            <li key={index}>
+                              {usage.userName} used {usage.gramsUsed}g on{" "}
+                              {new Date(usage.date).toLocaleDateString()}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "No usage recorded"
+                      )}
+                    </td>
                     )}
                     <td>
                       <button onClick={() => startEdit(chem)}>Edit</button>
-                      <button onClick={() => {
-  console.log("chemicalId:", chem.chemicalId);
-  handleDelete(chem.chemicalId);
-}}>Delete</button>
+                      <button onClick={() => handleDelete(chem.chemicalId)}>Delete</button>
                     </td>
                   </tr>
                 ))}
