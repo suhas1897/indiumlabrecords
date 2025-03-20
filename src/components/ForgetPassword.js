@@ -19,6 +19,7 @@ function ForgetPassword() {
 
   return (
     <div className="forgot-password-container">
+    <img src='https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png'/>
       <h2>Forgot Password</h2>
       <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <button onClick={handleSubmit}>Send OTP</button>
