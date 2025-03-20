@@ -8,7 +8,7 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const API_URL = 'https://labrecordsbackend.onrender.com/'
+  const API_URL = 'https://labrecordsbackend.onrender.com'
   // const handleLogin = async () => {
   //   try {
   //     const res = await axios.post('https://labrecordsbackend.onrender.com', { email, password });
