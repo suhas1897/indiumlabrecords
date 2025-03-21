@@ -28,7 +28,7 @@ function Register() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/register', { name, email, password, role });
+      const response = await axios.post('https://labrecordsbackend.onrender.com/register', { name, email, password, role });
       setLoading(false);
 
       // Success message with SweetAlert2
