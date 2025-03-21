@@ -10,7 +10,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [captchaValue, setCaptchaValue] = useState(null);
   const navigate = useNavigate();
-  const API_URL = 'http://localhost:5000';
+  const API_URL = 'https://labrecordsbackend.onrender.com';
   const recaptchaRef = useRef(null);
 
   const handleLogin = async (e) => {
