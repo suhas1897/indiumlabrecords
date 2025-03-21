@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -18,11 +20,15 @@ function ChemicalPage() {
   const [requestedGrams, setRequestedGrams] = useState("");
   const [scrapRequestChemicalId, setScrapRequestChemicalId] = useState("");
   const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
+  const [repeatChemicalId, setRepeatChemicalId] = useState("");
   const [newChemical, setNewChemical] = useState({
     chemicalName: "",
-    chemicalType: "",
-    type: "",
-    gramsAvailable: "",
+    chemicalType: "", // "Anhydrous", "Hydrous"
+    type: "", // "LR", "AR"
+    phase: "", // "Liquid", "Solid", "Gas"
+    purity: "",
+    quantityAvailable: "", // Renamed from gramsAvailable for flexibility
+    unit: "g", // Default unit, changes based on phase
     make: "",
     dateOfMFG: "",
     dateOfExp: "",
@@ -42,7 +48,7 @@ function ChemicalPage() {
 
   const itemsPerPage = 5;
   const navigate = useNavigate();
-  const API_URL = 'https://labrecordsbackend.onrender.com';
+  const API_URL = 'http://localhost:5000';
   const rackOptions = [
     "ALKALI METALS", "ALKALI EARTH METALS", "POST TRANSITION METALS",
     "TRANSITION METALS", "OTHERS", "ACIDS", "OTHER SOLUTIONS", "REFRIGERATOR"
@@ -51,8 +57,10 @@ function ChemicalPage() {
   const customLabels = {
     chemicalName: "Name of Chemical",
     chemicalType: "Type of Chemical",
-    type: "Reagent Category",
-    gramsAvailable: "Available Quantity (g)",
+    type: "Reagent Type",
+    phase: "Phase of Chemical",
+    purity: "Purity",
+    quantityAvailable: "Available Quantity",
     make: "Make",
     dateOfMFG: "Manufacturing Date",
     dateOfExp: "Expiration Date",
@@ -84,7 +92,7 @@ function ChemicalPage() {
           axios.get(`${API_URL}/getUserChemicals`, { headers: { Authorization: `Bearer ${token}` } }),
         ];
 
-        if (roleRes.data.role === "admin") {
+        if (roleRes.data.role === "admin" || roleRes.data.role === "superadmin") {
           promises.push(
             axios.get(`${API_URL}/getScrapChemicals`, { headers: { Authorization: `Bearer ${token}` } })
           );
@@ -96,7 +104,7 @@ function ChemicalPage() {
         setUserName(userDetailsRes.data.userName || "Unknown User");
         setUserUsageData(userChemicalsRes.data || []);
 
-        if (roleRes.data.role === "admin") {
+        if (roleRes.data.role === "admin" || roleRes.data.role === "superadmin") {
           setScrapChemicals(Array.isArray(adminResponses[0]?.data) ? adminResponses[0].data : []);
         }
       } catch (error) {
@@ -130,7 +138,10 @@ function ChemicalPage() {
     const { name, value, type, checked } = e.target;
     let finalValue = type === "checkbox" ? checked : name === "chemicalName" ? value.toUpperCase() : value;
 
-    if (type === "checkbox") {
+    if (name === "phase") {
+      const unit = value === "Solid" ? "g" : value === "Liquid" ? "mL" : "L";
+      setNewChemical((prev) => ({ ...prev, phase: value, unit, quantityAvailable: "" }));
+    } else if (type === "checkbox") {
       if (name === "isAbsolute" && checked) {
         setNewChemical((prev) => ({ ...prev, isApproximately: false, [name]: finalValue }));
       } else if (name === "isApproximately" && checked) {
@@ -164,6 +175,9 @@ function ChemicalPage() {
     }
   };
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -181,9 +195,9 @@ function ChemicalPage() {
       });
       setChemicalData(chemicalsRes.data || []);
       setNewChemical({
-        chemicalName: "", chemicalType: "", type: "", gramsAvailable: "", make: "",
-        dateOfMFG: "", dateOfExp: "", purchase: "", purchaseDate: "", invoiceNumber: "",
-        isAbsolute: false, isApproximately: false, rack: ""
+        chemicalName: "", chemicalType: "", type: "", phase: "", quantityAvailable: "",
+        unit: "g", make: "", dateOfMFG: "", dateOfExp: "", purchase: "", purchaseDate: "",
+        invoiceNumber: "", isAbsolute: false, isApproximately: false, rack: ""
       });
     } catch (error) {
       Swal.fire({
@@ -194,12 +208,75 @@ function ChemicalPage() {
     }
   };
 
+
+  
+const handleRepeatChemical = async () => {
+  const { value: chemicalId } = await Swal.fire({
+    title: 'Enter Chemical ID',
+    input: 'text',
+    inputLabel: 'Chemical ID',
+    inputPlaceholder: 'Enter the Chemical ID',
+    showCancelButton: true,
+    inputValidator: (value) => {
+      if (!value) {
+        return 'Please enter a Chemical ID!';
+      }
+    },
+  });
+
+  if (chemicalId) {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`${API_URL}/getchemicals`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const chemical = response.data.find((chem) => chem.chemicalId === chemicalId);
+
+      if (chemical) {
+        // Auto-fill the edit form with existing data, including purchaseDate
+        const updatedChemical = {
+          ...chemical,
+          dateOfMFG: new Date(chemical.dateOfMFG).toISOString().split("T")[0],
+          dateOfExp: new Date(chemical.dateOfExp).toISOString().split("T")[0],
+          purchaseDate: chemical.purchaseDate
+            ? new Date(chemical.purchaseDate).toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0], // Default to today if not set
+          purchase: chemical.purchase ? parseFloat(chemical.purchase) + 1 : 1, // Increment purchase counter
+        };
+        setEditChemical(updatedChemical);
+        setRepeatChemicalId(chemicalId);
+
+        Swal.fire({
+          icon: "success",
+          title: "Chemical Found!",
+          text: `Details for ${chemical.chemicalName} loaded for editing.`,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Not Found",
+          text: "Chemical ID not found!",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.error || "Server error",
+      });
+    }
+  }
+};
+
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     const payload = {
       chemicalName: editChemical.chemicalName,
-      gramsAvailable: parseFloat(editChemical.gramsAvailable) || 0,
+      quantityAvailable: parseFloat(editChemical.quantityAvailable) || 0,
+      unit: editChemical.unit,
       dateOfMFG: editChemical.dateOfMFG,
       dateOfExp: editChemical.dateOfExp,
       purchase: editChemical.purchase ? parseFloat(editChemical.purchase) : undefined,
@@ -285,7 +362,7 @@ function ChemicalPage() {
       Swal.fire({
         icon: "warning",
         title: "Missing Input",
-        text: "Please select a chemical and enter grams.",
+        text: "Please select a chemical and enter quantity.",
       });
       return;
     }
@@ -305,7 +382,7 @@ function ChemicalPage() {
       setChemicalData((prev) =>
         prev.map((chem) =>
           chem.chemicalId === selectedChemical
-            ? { ...chem, gramsAvailable: response.data.updatedStock }
+            ? { ...chem, quantityAvailable: response.data.updatedStock }
             : chem
         )
       );
@@ -326,7 +403,7 @@ function ChemicalPage() {
   };
 
   const downloadExcel = (type) => {
-    if (role !== "admin") return;
+    if (role !== "admin" && role !== "superadmin") return;
 
     let data, filename;
     switch (type) {
@@ -353,6 +430,147 @@ function ChemicalPage() {
     XLSX.writeFile(workbook, filename);
   };
 
+
+
+
+  const handleScrapRequest = async () => {
+    const { value } = await Swal.fire({
+      title: "Scrap Request",
+      html: `
+        <input id="chemicalId" class="swal2-input" placeholder="Enter Chemical ID" style="width: 80%;">
+        <input id="scrapPhoto" type="file" accept="image/*" class="swal2-file" style="margin-top: 10px;">
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+      preConfirm: () => {
+        const chemicalId = document.getElementById("chemicalId").value;
+        const scrapPhoto = document.getElementById("scrapPhoto").files[0];
+        if (!chemicalId) {
+          Swal.showValidationMessage("Please enter a Chemical ID!");
+          return null;
+        }
+        if (!scrapPhoto) {
+          Swal.showValidationMessage("Please upload a photo!");
+          return null;
+        }
+        return { chemicalId, scrapPhoto };
+      },
+    });
+
+    if (value) {
+      const { chemicalId, scrapPhoto } = value;
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("chemicalId", chemicalId);
+      formData.append("scrapPhoto", scrapPhoto);
+
+      try {
+        const response = await axios.post(`${API_URL}/scrapRequest`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        Swal.fire({
+          icon: "success",
+          title: "Scrap Request Sent!",
+          text: response.data.message,
+        });
+        setScrapRequestChemicalId(chemicalId);
+        if (role === "admin" || role === "superadmin") {
+          const scrapRes = await axios.get(`${API_URL}/getScrapChemicals`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setScrapChemicals(scrapRes.data || []);
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.error || "Server error",
+        });
+      }
+    }
+  };
+
+  const handleNewChemicalRequest = async () => {
+    const { value: chemicalName } = await Swal.fire({
+      title: "Enter New Chemical Name",
+      input: "text",
+      inputLabel: "Chemical Name",
+      inputPlaceholder: "Enter the chemical name",
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter a chemical name!";
+        }
+      },
+    });
+
+    if (chemicalName) {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.post(
+          `${API_URL}/newChemicalRequest`,
+          { chemicalName },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        Swal.fire({
+          icon: "success",
+          title: "New Chemical Request Sent!",
+          text: response.data.message,
+        });
+        setNewChemicalRequestName(chemicalName);
+        const newReqRes = await axios.get(`${API_URL}/getNewChemicalRequests`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setNewChemicalRequests(newReqRes.data || []);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.error || "Server error",
+        });
+      }
+    }
+  };
+
+
+    const handleResetCounter = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This will reset the chemical ID counter to 0. New chemical IDs will start from MURTI-BLR/INDIUM/BRL-001.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, reset it!",
+    });
+
+    if (result.isConfirmed) {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.post(
+          `${API_URL}/resetChemicalCounter`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Counter Reset!",
+          text: response.data.message,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.error || "Server error",
+        });
+      }
+    }
+  };
+
+
   return (
     <div className="form-container" style={{ position: "relative", padding: "20px" }}>
       <div style={{ position: "absolute", top: "10px", right: "10px", display: "flex", alignItems: "center", gap: "15px" }}>
@@ -373,7 +591,7 @@ function ChemicalPage() {
         <h1>CIMS - Chemical Inventory Management System</h1>
       </div>
 
-      {role === "admin" && (
+      {(role === "admin" || role === "superadmin") && (
         <>
           <div style={{ marginBottom: "20px", display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "space-between" }}>
             <div style={{ flex: "1 1 45%", minWidth: "200px" }}>
@@ -394,30 +612,81 @@ function ChemicalPage() {
             </div>
           </div>
 
+
+          
+
+
+          <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
+       <label style={{ display: "flex", alignItems: "center" }}>
+         <input
+          type="checkbox"
+          onChange={(e) => {
+            if (e.target.checked) handleRepeatChemical();
+          }}
+          style={{
+            width: "16px",
+            height: "16px",
+            marginRight: "8px",
+            accentColor: "#2c3e50",
+            cursor: "pointer",
+          }}
+        />
+        Repeat
+      </label>
+    </div>
+
           <h2>Add New Chemical</h2>
           <form onSubmit={handleSubmit}>
             {Object.keys(newChemical)
-              .filter((key) => key !== "isAbsolute" && key !== "isApproximately" && key !== "rack")
+              .filter((key) => key !== "isAbsolute" && key !== "isApproximately" && key !== "rack" && key !== "unit")
               .map((key) => (
                 <div key={key} style={{ margin: "10px 0" }}>
                   <label htmlFor={key} style={{ display: "block", marginBottom: "5px", fontSize: "18px", color: "#fff", fontWeight: "700" }}>
                     {customLabels[key] || key}
                   </label>
-                  <input
-                    id={key}
-                    type={
-                      key.includes("date") || key === "purchaseDate"
-                        ? "date"
-                        : key === "gramsAvailable" || key === "purchase"
-                        ? "number"
-                        : "text"
-                    }
-                    name={key}
-                    value={newChemical[key]}
-                    onChange={handleChange}
-                    required={key !== "purchase" && key !== "purchaseDate" && key !== "invoiceNumber"}
-                    style={{ display: "block", padding: "5px", width: "100%" }}
-                  />
+                  {key === "chemicalType" ? (
+                    <select name={key} value={newChemical[key]} onChange={handleChange} required style={{ padding: "5px", width: "100%" }}>
+                      <option value="">-- Select Type --</option>
+                      <option value="Anhydrous">Anhydrous</option>
+                      <option value="Hydrous">Hydrous</option>
+                    </select>
+                  ) : key === "type" ? (
+                    <select name={key} value={newChemical[key]} onChange={handleChange} required style={{ padding: "5px", width: "100%" }}>
+                      <option value="">-- Select Reagent Type --</option>
+                      <option value="LR">LR</option>
+                      <option value="AR">AR</option>
+                    </select>
+                  ) : key === "phase" ? (
+                    <select name={key} value={newChemical[key]} onChange={handleChange} required style={{ padding: "5px", width: "100%" }}>
+                      <option value="">-- Select Phase --</option>
+                      <option value="Solid">Solid</option>
+                      <option value="Liquid">Liquid</option>
+                      <option value="Gas">Gas</option>
+                    </select>
+                  ) : key === "quantityAvailable" ? (
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <input
+                        id={key}
+                        type="number"
+                        name={key}
+                        value={newChemical[key]}
+                        onChange={handleChange}
+                        required
+                        style={{ padding: "5px", width: "80%" }}
+                      />
+                      <span style={{ marginLeft: "10px", color: "#fff" }}>{newChemical.unit}</span>
+                    </div>
+                  ) : (
+                    <input
+                      id={key}
+                      type={key.includes("date") || key === "purchaseDate" ? "date" : key === "purchase" ? "number" : "text"}
+                      name={key}
+                      value={newChemical[key]}
+                      onChange={handleChange}
+                      required={key !== "purchase" && key !== "purchaseDate" && key !== "invoiceNumber"}
+                      style={{ display: "block", padding: "5px", width: "100%" }}
+                    />
+                  )}
                 </div>
               ))}
 
@@ -466,6 +735,21 @@ function ChemicalPage() {
             <button type="submit" style={{ padding: "8px 16px", backgroundColor: "#2c3e50", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", marginTop: "10px" }}>
               Add Chemical
             </button>
+
+            <button
+        onClick={handleResetCounter}
+        style={{
+          padding: "8px 16px",
+          backgroundColor: "#d33",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          marginTop: "20px",
+        }}
+      >
+        Reset Chemical ID Counter
+      </button>
           </form>
 
           {editChemical && (
@@ -487,18 +771,21 @@ function ChemicalPage() {
                   />
                 </div>
                 <div style={{ margin: "10px 0" }}>
-                  <label htmlFor="gramsAvailable" style={{ display: "block", marginBottom: "5px", fontSize: "18px", color: "#fff", fontWeight: "700" }}>
-                    {customLabels.gramsAvailable}
+                  <label htmlFor="quantityAvailable" style={{ display: "block", marginBottom: "5px", fontSize: "18px", color: "#fff", fontWeight: "700" }}>
+                    {customLabels.quantityAvailable}
                   </label>
-                  <input
-                    id="gramsAvailable"
-                    type="number"
-                    name="gramsAvailable"
-                    value={editChemical.gramsAvailable}
-                    onChange={handleEditChange}
-                    required
-                    style={{ padding: "5px", width: "100%" }}
-                  />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <input
+                      id="quantityAvailable"
+                      type="number"
+                      name="quantityAvailable"
+                      value={editChemical.quantityAvailable}
+                      onChange={handleEditChange}
+                      required
+                      style={{ padding: "5px", width: "80%" }}
+                    />
+                    <span style={{ marginLeft: "10px", color: "#fff" }}>{editChemical.unit}</span>
+                  </div>
                 </div>
                 <div style={{ margin: "10px 0" }}>
                   <label htmlFor="dateOfMFG" style={{ display: "block", marginBottom: "5px", fontSize: "18px", color: "#fff", fontWeight: "700" }}>
@@ -628,8 +915,11 @@ function ChemicalPage() {
                   <th>Chemical Name</th>
                   <th>Chemical Type</th>
                   <th>Reagent Type</th>
-                  <th>Grams Available</th>
-                  <th>Date Of MFD</th>
+                  <th>Phase</th>
+                  <th>Purity</th>
+                  <th>Quantity Available</th>
+                  <th>Unit</th>
+                  <th>Date Of MFG</th>
                   <th>Date Of EXP</th>
                   <th>Purchase</th>
                   <th>Purchase Date</th>
@@ -637,7 +927,7 @@ function ChemicalPage() {
                   <th>Absolute</th>
                   <th>Approximately</th>
                   <th>Rack</th>
-                  {role === "admin" && <th>User Usage</th>}
+                  {(role === "admin" || role === "superadmin") && <th>User Usage</th>}
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -648,7 +938,10 @@ function ChemicalPage() {
                     <td style={{ textTransform: "capitalize" }}>{chem.chemicalName}</td>
                     <td>{chem.chemicalType}</td>
                     <td>{chem.type}</td>
-                    <td>{chem.gramsAvailable}</td>
+                    <td>{chem.phase}</td>
+                    <td>{chem.purity}</td>
+                    <td>{chem.quantityAvailable}</td>
+                    <td>{chem.unit}</td>
                     <td>{new Date(chem.dateOfMFG).toLocaleDateString()}</td>
                     <td>{new Date(chem.dateOfExp).toLocaleDateString()}</td>
                     <td>{chem.purchase}</td>
@@ -657,13 +950,13 @@ function ChemicalPage() {
                     <td>{chem.isAbsolute ? "Yes" : "No"}</td>
                     <td>{chem.isApproximately ? "Yes" : "No"}</td>
                     <td>{chem.rack}</td>
-                    {role === "admin" && (
+                    {(role === "admin" || role === "superadmin") && (
                       <td>
                         {chem.userUsage && chem.userUsage.length > 0 ? (
                           <ul>
                             {chem.userUsage.map((usage, index) => (
                               <li key={index}>
-                                {usage.userName} used {usage.gramsUsed}g on {new Date(usage.date).toLocaleDateString()}
+                                {usage.userName} used {usage.quantityUsed}{chem.unit} on {new Date(usage.date).toLocaleDateString()}
                               </li>
                             ))}
                           </ul>
@@ -704,7 +997,7 @@ function ChemicalPage() {
             <option value="">-- Select a Chemical --</option>
             {filteredChemicalData.map((chem) => (
               <option key={chem.chemicalId} value={chem.chemicalId}>
-                {chem.chemicalName} ({chem.gramsAvailable}g available)
+                {chem.chemicalName} ({chem.quantityAvailable}{chem.unit} available)
               </option>
             ))}
           </select>
@@ -713,11 +1006,14 @@ function ChemicalPage() {
             <table border="1">
               <thead>
                 <tr>
-                  <td>Chemical Id</td>
+                  <th>Chemical ID</th>
                   <th>Chemical Name</th>
                   <th>Type</th>
-                  <th>Grams Available</th>
+                  <th>Phase</th>
+                  <th>Quantity Available</th>
+                  <th>Unit</th>
                   <th>Make</th>
+                  <th>Rack</th>
                 </tr>
               </thead>
               <tbody>
@@ -725,8 +1021,11 @@ function ChemicalPage() {
                   <td>{selectedChemicalDetails.chemicalId}</td>
                   <td>{selectedChemicalDetails.chemicalName}</td>
                   <td>{selectedChemicalDetails.type}</td>
-                  <td>{selectedChemicalDetails.gramsAvailable}</td>
+                  <td>{selectedChemicalDetails.phase}</td>
+                  <td>{selectedChemicalDetails.quantityAvailable}</td>
+                  <td>{selectedChemicalDetails.unit}</td>
                   <td>{selectedChemicalDetails.make}</td>
+                  <td>{selectedChemicalDetails.rack}</td>
                 </tr>
               </tbody>
             </table>
@@ -736,11 +1035,46 @@ function ChemicalPage() {
 
       <input
         type="number"
-        placeholder="Enter grams"
+        placeholder="Enter quantity"
         value={requestedGrams}
         onChange={(e) => setRequestedGrams(e.target.value)}
       />
       <button style={{ marginBottom: "50px" }} onClick={handleRequestChemical}>Use Chemical</button>
+
+      <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
+        <label style={{ display: "flex", alignItems: "center" }}>
+          <input
+            type="checkbox"
+            onChange={(e) => {
+              if (e.target.checked) handleScrapRequest();
+            }}
+            style={{
+              width: "16px",
+              height: "16px",
+              marginRight: "8px",
+              accentColor: "#2c3e50",
+              cursor: "pointer",
+            }}
+          />
+          <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Scrap Request</span>
+        </label>
+        <label style={{ display: "flex", alignItems: "center" }}>
+          <input
+            type="checkbox"
+            onChange={(e) => {
+              if (e.target.checked) handleNewChemicalRequest();
+            }}
+            style={{
+              width: "16px",
+              height: "16px",
+              marginRight: "8px",
+              accentColor: "#2c3e50",
+              cursor: "pointer",
+            }}
+          />
+          <span style={{ fontSize: "18px", color: "#f0e0c1" }}>New Chemical Request</span>
+        </label>
+      </div>
 
       <Footer />
     </div>
