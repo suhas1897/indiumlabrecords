@@ -3,15 +3,15 @@ import axios from 'axios';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from 'sweetalert2';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [captchaValue, setCaptchaValue] = useState(null); // Store CAPTCHA response
+  const [captchaValue, setCaptchaValue] = useState(null);
   const navigate = useNavigate();
-  const API_URL = 'https://labrecordsbackend.onrender.com';
-  const recaptchaRef = useRef(null); // Reference to reset CAPTCHA if needed
+  const API_URL = 'http://localhost:5000';
+  const recaptchaRef = useRef(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,20 +32,18 @@ function Login() {
       });
       localStorage.setItem("token", response.data.token);
       
-      // Success alert
       Swal.fire({
         icon: 'success',
         title: 'Login Successful',
         text: 'Welcome to CIMS!',
         confirmButtonColor: '#009e85',
-        timer: 1500, // Auto-close after 1.5 seconds
+        timer: 1500,
         showConfirmButton: false,
       }).then(() => {
         navigate("/dashboard");
       });
     } catch (error) {
       console.error(error);
-      // Error alert
       Swal.fire({
         icon: 'error',
         title: 'Login Failed',
@@ -58,19 +56,11 @@ function Login() {
   };
 
   const onCaptchaChange = (value) => {
-    setCaptchaValue(value); // Set CAPTCHA value when completed
+    setCaptchaValue(value);
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      // background: '#007367',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
-      fontFamily: "'Poppins', sans-serif"
-    }}>
+    <div >
       <div style={{
         background: '#003d36',
         borderRadius: '12px',
@@ -91,7 +81,7 @@ function Login() {
             fontSize: '26px',
             margin: 0 
           }}>
-            Welcome CIMS
+            Welcome To CIMS
           </h2>
         </div>
 
@@ -139,7 +129,7 @@ function Login() {
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey="6LfK2PoqAAAAAIpqeTA6izDI6y1wsUJ_qRpcTe41" // Your Site Key
+            sitekey="6LfK2PoqAAAAAIpqeTA6izDI6y1wsUJ_qRpcTe41"
             onChange={onCaptchaChange}
             theme="dark"
           />
@@ -205,7 +195,6 @@ function Login() {
       </div>
       <Footer />
     </div>
-    
   );
 }
 
