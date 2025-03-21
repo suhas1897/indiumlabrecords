@@ -9,7 +9,7 @@ function Register() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('user'); // Default role is 'user'
   const navigate = useNavigate();
-
+// https://labrecordsbackend.onrender.com/register
   const handleRegister = async () => {
     try {
       await axios.post('https://labrecordsbackend.onrender.com/register', { name, email, password, role });
@@ -20,8 +20,12 @@ function Register() {
   };
 
   return (
-    <div className="register-container">
-    <img src='https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png'/>
+    <div className="dashboard-container">
+      <img 
+            src='https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png'
+            alt="Logo"
+            style={{ width: '150px', marginBottom: '20px' }}
+          />
       <h2>Register</h2>
       <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
