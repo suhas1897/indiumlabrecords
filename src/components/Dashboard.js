@@ -5,6 +5,8 @@ import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
 import Select from "react-select";
 import "./ChemicalPage.css";
+import Footer from "./Footer";
+import { FaSignOutAlt } from 'react-icons/fa';
 
 function ChemicalPage() {
   const [role, setRole] = useState(null);
@@ -51,6 +53,20 @@ const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
     "OTHER SOLUTIONS",
     "REFRIGERATOR"
   ];
+
+  const customLabels = {
+    chemicalName: "Name of Chemical",
+    chemicalType: "Type of Chemical",
+    type: "Reagent Category",
+    gramsAvailable: "Available Quantity (g)",
+    make: "Manufacturer",
+    dateOfMFG: "Manufacturing Date",
+    dateOfExp: "Expiration Date",
+    purchase: "Purchase Quantity",
+    purchaseDate: "Date of Purchase",
+    invoiceNumber: "Invoice #",
+    rack: "Storage Rack"
+  };
 
   
   // Add to your state declarations at the top
@@ -674,183 +690,334 @@ const handleDelete = async (chemicalId) => {
 
 
   return (
-    <div className="form-container">
-      <h2>Welcome, {userName}!</h2>
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-  <img 
-    src="https://res.cloudinary.com/dcggiwav8/image/upload/v1742466457/Alchemira/efpj7hd9qeczldekojn1.png" 
-    alt="CIMS Logo" 
-    style={{ display: 'block', margin: '0 auto' }} 
-  />
-  <h1 style={{  marginTop: '10px' }}>
-    CIMS - Chemical Inventory Management System
-  </h1>
-</div>
+    <div className="form-container" style={{ position: "relative", padding: "20px" }}>
+    {/* Top Right Corner Section */}
+    <div style={{
+      position: "absolute",
+      top: "10px",
+      right: "10px",
+      display: "flex",
+      alignItems: "center",
+      gap: "15px"
+    }}>
+      <h2 style={{ margin: 0, color: "#fff" }}>Welcome, {userName}!</h2>
+      <FaSignOutAlt
+  onClick={() => navigate("/login")}
+  style={{
+    fontSize: "24px",
+    color: "#d33",
+    cursor: "pointer",
+    transition: "transform 0.2s" // Optional: adds hover effect
+  }}
+  title="Logout"
+  onMouseEnter={(e) => e.target.style.transform = "scale(1.2)"}
+  onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+/>
+    </div>
+
+    {/* Rest of your existing content */}
+    <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '40px' }}>
+    <img 
+            src='https://res.cloudinary.com/dcggiwav8/image/upload/v1742464649/Alchemira/i8fvli3uwr7017odgbss.png'
+            alt="Logo"
+            style={{ width: '150px', marginBottom: '20px' }}
+          />
+      <h1 style={{ marginTop: '10px' }}>
+        CIMS - Chemical Inventory Management System
+      </h1>
+    </div>
       
 
       {role === "admin" && (
         <>
 
 
-<div style={{ marginBottom: "20px" }}>
-          <button
-            onClick={() => downloadExcel("all")}
-            style={{ marginRight: "10px", padding: "8px 16px" }}
-          >
-            Download All Chemicals
-          </button>
-          <button
-            onClick={() => downloadExcel("usage")}
-            style={{ marginRight: "10px", padding: "8px 16px" }}
-          >
-            Download Usage Data
-          </button>
-          <button
-            onClick={() => downloadExcel("scrap")}
-            style={{ marginRight: "10px", padding: "8px 16px" }}
-          >
-            Download Scrap Chemicals
-          </button>
-          <button
-            onClick={() => downloadExcel("new")}
-            style={{ padding: "8px 16px" }}
-          >
-            Download New Requests
-          </button>
-        </div>
+<div style={{ 
+    marginBottom: "20px", 
+    display: "flex", 
+    flexWrap: "wrap", 
+    gap: "20px",
+    justifyContent: "space-between"
+  }}>
+    <div style={{ flex: "1 1 45%", minWidth: "200px" }}>
+      <button
+        onClick={() => {
+          Swal.fire({
+            title: "Download All Chemicals?",
+            text: "Do you want to download the complete chemical inventory?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, download it!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              downloadExcel("all");
+              Swal.fire(
+                "Downloaded!",
+                "The chemical inventory file has been downloaded.",
+                "success"
+              );
+            }
+          });
+        }}
+        style={{ 
+          width: "100%",
+          marginBottom: "10px",
+          padding: "8px 16px",
+          backgroundColor: "#2c3e50",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+      >
+        Download All Chemicals
+      </button>
+      <button
+        onClick={() => {
+          Swal.fire({
+            title: "Download Usage Data?",
+            text: "Do you want to download the chemical usage data?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, download it!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              downloadExcel("usage");
+              Swal.fire(
+                "Downloaded!",
+                "The usage data file has been downloaded.",
+                "success"
+              );
+            }
+          });
+        }}
+        style={{ 
+          width: "100%",
+          padding: "8px 16px",
+          backgroundColor: "#2c3e50",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+      >
+        Download Usage Data
+      </button>
+    </div>
+    
+    <div style={{ flex: "1 1 45%", minWidth: "200px" }}>
+      <button
+        onClick={() => {
+          Swal.fire({
+            title: "Download Scrap Chemicals?",
+            text: "Do you want to download the scrap chemicals data?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, download it!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              downloadExcel("scrap");
+              Swal.fire(
+                "Downloaded!",
+                "The scrap chemicals file has been downloaded.",
+                "success"
+              );
+            }
+          });
+        }}
+        style={{ 
+          width: "100%",
+          marginBottom: "10px",
+          padding: "8px 16px",
+          backgroundColor: "#2c3e50",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+      >
+        Download Scrap Chemicals
+      </button>
+      <button
+        onClick={() => {
+          Swal.fire({
+            title: "Download New Requests?",
+            text: "Do you want to download the new chemical requests?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, download it!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              downloadExcel("new");
+              Swal.fire(
+                "Downloaded!",
+                "The new requests file has been downloaded.",
+                "success"
+              );
+            }
+          });
+        }}
+        style={{ 
+          width: "100%",
+          padding: "8px 16px",
+          backgroundColor: "#2c3e50",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+      >
+        Download New Requests
+      </button>
+    </div>
+  </div>
+
         
         <h2>Add New Chemical</h2>
-      <form onSubmit={handleSubmit}>
-        {Object.keys(newChemical)
-          .filter((key) => key !== "isAbsolute" && key !== "isApproximately" && key !== "rack") // Exclude checkboxes from input mapping
-          .map((key) => (
-            <div key={key} style={{ margin: "10px 0" }}>
-              <label
-                htmlFor={key}
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                  fontSize: "18px",
-                  color: "#fff",
-                  fontWeight: "700",
-                }}
-              >
-                {key.replace(/([A-Z])/g, " $1").trim()}
-              </label>
-              <input
-          id={key}
-          type={
-            key.includes("date") || key === "purchaseDate"
-              ? "date"
-              : key === "gramsAvailable" || key === "purchase"
-              ? "number"
-              : "text"
-          }
-          name={key}
-          value={newChemical[key]}
-          onChange={handleChange}
-          required={key !== "purchase" && key !== "purchaseDate" && key !== "invoiceNumber"} // Adjust required fields
-        />
-            </div>
-          ))}
-
-<div style={{ margin: "10px 0" }}>
-              <label
-                htmlFor="rack"
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                  fontSize: "18px",
-                  color: "#fff",
-                  fontWeight: "700",
-                }}
-              >
-                Rack
-              </label>
-              <select
-                id="rack"
-                name="rack"
-                value={newChemical.rack}
-                onChange={handleChange}
-                required
-                style={{ padding: "5px", width: "100%" }}
-              >
-                <option value="">-- Select Rack --</option>
-                {rackOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-        {/* Add Checkboxes */}
-        <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
-          <label style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              name="isAbsolute"
-              checked={newChemical.isAbsolute}
-              onChange={handleChange}
+    <form onSubmit={handleSubmit}>
+      {Object.keys(newChemical)
+        .filter((key) => key !== "isAbsolute" && key !== "isApproximately" && key !== "rack") // Exclude checkboxes and rack
+        .map((key) => (
+          <div key={key} style={{ margin: "10px 0" }}>
+            <label
+              htmlFor={key}
               style={{
-                width: "16px",
-                height: "16px",
-                marginRight: "8px",
-                accentColor: "#2c3e50",
-                cursor: "pointer",
+                display: "block",
+                marginBottom: "5px",
+                fontSize: "18px",
+                color: "#fff",
+                fontWeight: "700",
+              }}
+            >
+              {customLabels[key] || key} {/* Use custom label or fallback to key */}
+            </label>
+            <input
+              id={key}
+              type={
+                key.includes("date") || key === "purchaseDate"
+                  ? "date"
+                  : key === "gramsAvailable" || key === "purchase"
+                  ? "number"
+                  : "text"
+              }
+              name={key}
+              value={newChemical[key]}
+              onChange={handleChange}
+              required={key !== "purchase" && key !== "purchaseDate" && key !== "invoiceNumber"}
+              style={{
+                display: "block",
+                padding: "5px",
+                width: "100%",
               }}
             />
-            <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Absolute</span>
-          </label>
-          <label style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              name="isApproximately"
-              checked={newChemical.isApproximately}
-              onChange={handleChange}
-              style={{
-                width: "16px",
-                height: "16px",
-                marginRight: "8px",
-                accentColor: "#2c3e50",
-                cursor: "pointer",
-              }}
-            />
-            <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Approximately</span>
-          </label>
-        </div>  
+          </div>
+        ))}
 
-        <button
-          type="submit"
+      {/* Rack Select Field */}
+      <div style={{ margin: "10px 0" }}>
+        <label
+          htmlFor="rack"
           style={{
-            padding: "8px 16px",
-            backgroundColor: "#2c3e50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            marginTop: "10px",
+            display: "block",
+            marginBottom: "5px",
+            fontSize: "18px",
+            color: "#fff",
+            fontWeight: "700",
           }}
         >
-          Add Chemical
-        </button>
+          {customLabels.rack}
+        </label>
+        <select
+          id="rack"
+          name="rack"
+          value={newChemical.rack}
+          onChange={handleChange}
+          required
+          style={{ padding: "5px", width: "100%" }}
+        >
+          <option value="">-- Select Rack --</option>
+          {rackOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      {/* Checkboxes */}
+      <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
+        <label style={{ display: "flex", alignItems: "center" }}>
+          <input
+            type="checkbox"
+            name="isAbsolute"
+            checked={newChemical.isAbsolute}
+            onChange={handleChange}
+            style={{
+              width: "16px",
+              height: "16px",
+              marginRight: "8px",
+              accentColor: "#2c3e50",
+              cursor: "pointer",
+            }}
+          />
+          <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Absolute</span>
+        </label>
+        <label style={{ display: "flex", alignItems: "center" }}>
+          <input
+            type="checkbox"
+            name="isApproximately"
+            checked={newChemical.isApproximately}
+            onChange={handleChange}
+            style={{
+              width: "16px",
+              height: "16px",
+              marginRight: "8px",
+              accentColor: "#2c3e50",
+              cursor: "pointer",
+            }}
+          />
+          <span style={{ fontSize: "18px", color: "#f0e0c1" }}>Approximately</span>
+        </label>
+      </div>
 
-        <button
-      onClick={handleResetCounter}
-      style={{
-        padding: "8px 16px",
-        backgroundColor: "#d33",
-        color: "white",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer",
-        marginTop: "20px",
-      }}
-    >
-      Reset Chemical ID Counter
-    </button>
-      </form>
+      <button
+        type="submit"
+        style={{
+          padding: "8px 16px",
+          backgroundColor: "#2c3e50",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          marginTop: "10px",
+        }}
+      >
+        Add Chemical
+      </button>
+
+      <button
+        onClick={handleResetCounter}
+        style={{
+          padding: "8px 16px",
+          backgroundColor: "#d33",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          marginTop: "20px",
+        }}
+      >
+        Reset Chemical ID Counter
+      </button>
+    </form>
           {/* New Checkboxes Section */}
           <div style={{ margin: "20px 0", display: "flex", gap: "15px" }}>
       <label style={{ display: "flex", alignItems: "center" }}>
@@ -1065,7 +1232,7 @@ const handleDelete = async (chemicalId) => {
         value={requestedGrams}
         onChange={(e) => setRequestedGrams(e.target.value)}
       />
-      <button onClick={handleRequestChemical}>Use Chemical</button>
+      <button style={{ marginBottom: "50px" }} onClick={handleRequestChemical}>Use Chemical</button>
 
 
 
@@ -1106,9 +1273,18 @@ const handleDelete = async (chemicalId) => {
     </div>
     )}
 
-      <button onClick={() => navigate("/login")}>Logout</button>
+      
+      
+
+      <Footer />
     </div>
+
+
+
+
+    
   );
+  
 }
 
 export default ChemicalPage;
