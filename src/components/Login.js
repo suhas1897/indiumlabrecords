@@ -139,7 +139,7 @@ function Login() {
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey="6LfK2PoqAAAAAIpqeTA6izDI6y1wsUJ_qRpcTe41" // Your Site Key
+            sitekey="6Lctc_sqAAAAAI76DDjUE2aiOmwcocwJE5afDRAv" // Your Site Key
             onChange={onCaptchaChange}
             theme="dark"
           />
