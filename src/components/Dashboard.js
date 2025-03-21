@@ -42,7 +42,7 @@ function ChemicalPage() {
 
   const itemsPerPage = 5;
   const navigate = useNavigate();
-  const API_URL = 'http://localhost:5000';
+  const API_URL = 'https://labrecordsbackend.onrender.com';
   const rackOptions = [
     "ALKALI METALS", "ALKALI EARTH METALS", "POST TRANSITION METALS",
     "TRANSITION METALS", "OTHERS", "ACIDS", "OTHER SOLUTIONS", "REFRIGERATOR"
