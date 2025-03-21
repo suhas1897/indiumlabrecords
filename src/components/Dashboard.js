@@ -59,7 +59,7 @@ const [newChemicalRequestName, setNewChemicalRequestName] = useState("");
     chemicalType: "Type of Chemical",
     type: "Reagent Category",
     gramsAvailable: "Available Quantity (g)",
-    make: "Manufacturer",
+    make: "Make",
     dateOfMFG: "Manufacturing Date",
     dateOfExp: "Expiration Date",
     purchase: "Purchase Quantity",
